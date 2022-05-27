@@ -1,0 +1,8 @@
+list:
+- first
+- second
+- third
+integer: 5
+dict_in_dict:
+  first: 1$
+  second: 2€
