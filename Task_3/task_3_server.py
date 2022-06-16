@@ -5,7 +5,7 @@ import logging
 import log_project.config_server_log
 
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
-from errors import IncorrectDataRecivedError
+from errors import IncorrectDataReceivedError
 
 from common.variables import ACTION, ACCOUNT_NAME, RESPONSE, MAX_CONNECTIONS, PRESENCE, TIME, USER, ERROR, DEFAULT_PORT
 from common.utils import get_message, send_message

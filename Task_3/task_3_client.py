@@ -12,7 +12,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 from common.variables import ACTION, PRESENCE, TIME, USER, ACCOUNT_NAME, RESPONSE, ERROR, DEFAULT_IP_ADDRESS,\
     DEFAULT_PORT
 
-CLIENT_LOGGER = log_project.getLogger('client')
+CLIENT_LOGGER = logging.getLogger('client')
 
 
 def create_presence(account_name):

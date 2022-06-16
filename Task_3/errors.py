@@ -1,4 +1,4 @@
-class IncorrectDataRecivedError(Exception):
+class IncorrectDataReceivedError(Exception):
     def __str__(self):
         return 'Принято некорректное сообщение от удалённого компьютера.'
 
