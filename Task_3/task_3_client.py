@@ -3,7 +3,7 @@ import json
 import time
 import argparse
 import logging
-import logs.config_client_log
+import log_project.config_client_log
 from errors import ReqFieldMissingError
 
 from common.utils import get_message, send_message
@@ -12,7 +12,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 from common.variables import ACTION, PRESENCE, TIME, USER, ACCOUNT_NAME, RESPONSE, ERROR, DEFAULT_IP_ADDRESS,\
     DEFAULT_PORT
 
-CLIENT_LOGGER = logging.getLogger('client')
+CLIENT_LOGGER = log_project.getLogger('client')
 
 
 def create_presence(account_name):
