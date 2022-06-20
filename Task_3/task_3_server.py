@@ -63,10 +63,11 @@ def main():
             SERVER_LOGGER.error(f'Не удалось декодировать Json строку, полученную от '
                                 f'клиента {client_address}. Соединение закрывается.')
             client_sock.close()
-        except IncorrectDataRecivedError:
+        except IncorrectDataReceivedError:
             SERVER_LOGGER.error(f'От клиента {client_address} приняты некорректные данные. '
                                 f'Соединение закрывается.')
             client_sock.close()
+
 
 if __name__ == '__main__':
     main()
