@@ -4,7 +4,7 @@ import argparse
 import logging
 import log_project.config_server_log
 
-from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
+from socket import socket, AF_INET, SOCK_STREAM
 from errors import IncorrectDataReceivedError
 
 from common.variables import ACTION, ACCOUNT_NAME, RESPONSE, MAX_CONNECTIONS, PRESENCE, TIME, USER, ERROR, DEFAULT_PORT
@@ -30,26 +30,35 @@ def create_arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', default=DEFAULT_PORT, type=int, nargs='?')
     parser.add_argument('-a', default='', nargs='?')
-    return parser
+    namespace = parser.parse_args(sys.argv[1:])
+    listen_address = namespace.a
+    listen_port = namespace.p
+
+    # проверка получения корретного номера порта для работы сервера.
+    if not 1023 < listen_port < 65536:
+        LOGGER.critical(
+            f'Попытка запуска сервера с указанием неподходящего порта '
+            f'{listen_port}. Допустимы адреса с 1024 до 65535.')
+        sys.exit(1)
+
+    return listen_address, listen_port
 
 
 @log
 def main():
-    parser = create_arg_parser()
-    namespace = parser.parse_args(sys.argv[1:])
-    listen_address = namespace.a
-    listen_port = namespace.p
-    if not 1023 < listen_port < 65536:
-        LOGGER.critical(f'Попытка запуска сервера с указанием неподходящего порта '
-                               f'{listen_port}. Допустимы адреса с 1024 до 65535.')
-        sys.exit(1)
-    LOGGER.info(f'Запущен сервер, порт для подключений: {listen_port}, '
-                       f'адрес с которого принимаются подключения: {listen_address}. '
-                       f'Если адрес не указан, принимаются соединения с любых адресов.')
+    listen_address, listen_port = create_arg_parser()
+
+    LOGGER.info(
+        f'Запущен сервер, порт для подключений: {listen_port}, '
+        f'адрес с которого принимаются подключения: {listen_address}. '
+        f'Если адрес не указан, принимаются соединения с любых адресов.')
 
     serv_sock = socket(AF_INET, SOCK_STREAM)
-    serv_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     serv_sock.bind((listen_address, listen_port))
+    serv_sock.settimeout(0.5)
+    clients = []
+    messages = []
+
     serv_sock.listen(MAX_CONNECTIONS)
 
     while True:
