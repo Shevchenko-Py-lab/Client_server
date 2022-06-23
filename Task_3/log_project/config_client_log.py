@@ -1,13 +1,14 @@
 import sys
 import os
 import logging
-sys.path.append('../logs/')
 from common.variables import LOGGING_LEVEL, ENCODING
+
+sys.path.append('../')
 
 CLIENT_FORMATTER = logging.Formatter('%(asctime)s %(levelname)-8s %(filename)s %(message)s')
 
 PATH = os.path.dirname(os.path.abspath(__file__))
-PATH = os.path.join(PATH, 'client.log')
+PATH = os.path.join(PATH+'/logs/', 'client.log')
 
 STREAM_HANDLER = logging.StreamHandler(sys.stderr)
 STREAM_HANDLER.setFormatter(CLIENT_FORMATTER)
