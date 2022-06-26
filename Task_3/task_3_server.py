@@ -1,12 +1,10 @@
 import select
 import sys
-import json
 import argparse
 import logging
 import log_project.config_server_log
 
-from socket import socket, AF_INET, SOCK_STREAM
-from errors import IncorrectDataReceivedError
+from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 
 from common.variables import DEFAULT_PORT, MAX_CONNECTIONS, ACTION, TIME, \
     USER, ACCOUNT_NAME, SENDER, PRESENCE, ERROR, MESSAGE, \
@@ -93,8 +91,10 @@ def main():
         f'Если адрес не указан, принимаются соединения с любых адресов.')
 
     serv_sock = socket(AF_INET, SOCK_STREAM)
+    serv_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     serv_sock.bind((listen_address, listen_port))
     serv_sock.settimeout(0.5)
+
     clients = []
     messages = []
 
@@ -105,8 +105,7 @@ def main():
     while True:
         try:
             client_sock, client_address = serv_sock.accept()
-        except OSError as err:
-            print(err.errno)  # The error number returns None because it's just a timeout
+        except OSError:
             pass
         else:
             LOGGER.info(f'Установлено соедение с ПК {client_address}')
@@ -125,26 +124,19 @@ def main():
                 try:
                     process_client_message(get_message(client_with_message),
                                            messages, client_with_message, clients, names)
-                except:
+                except Exception:
                     LOGGER.info(f'Клиент {client_with_message.getpeername()} '
                                 f'отключился от сервера.')
                     clients.remove(client_with_message)
 
-        if messages and send_data_lst:
-            message = {
-                ACTION: MESSAGE,
-                SENDER: messages[0][0],
-                TIME: time.time(),
-                MESSAGE_TEXT: messages[0][1]
-            }
-            del messages[0]
-            for waiting_client in send_data_lst:
-                try:
-                    send_message(waiting_client, message)
-                except:
-                    LOGGER.info(f'Клиент {waiting_client.getpeername()} отключился от сервера.')
-                    waiting_client.close()
-                    clients.remove(waiting_client)
+        for i in messages:
+            try:
+                process_message(i, names, send_data_lst)
+            except Exception:
+                LOGGER.info(f'Связь с клиентом с именем {i[DESTINATION]} была потеряна')
+                clients.remove(names[i[DESTINATION]])
+                del names[i[DESTINATION]]
+        messages.clear()
 
 
 if __name__ == '__main__':
