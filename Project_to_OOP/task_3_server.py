@@ -1,8 +1,3 @@
-import select
-import sys
-import argparse
-import logging
-import socket
 import sys
 import argparse
 import json
@@ -15,6 +10,8 @@ from Project_to_OOP.common.variables import DEFAULT_PORT, MAX_CONNECTIONS, ACTIO
     USER, ACCOUNT_NAME, SENDER, PRESENCE, ERROR, MESSAGE, \
     MESSAGE_TEXT, RESPONSE_400, DESTINATION, RESPONSE_200, EXIT
 from Project_to_OOP.common.utils import get_message, send_message
+from Project_to_OOP.descriptors import ServerPort
+from Project_to_OOP.metaclass import ServerVerifier
 from Project_to_OOP.unit_tests.log_decorator import log
 
 LOGGER = logging.getLogger('server')
@@ -28,18 +25,12 @@ def create_arg_parser():
     namespace = parser.parse_args(sys.argv[1:])
     listen_address = namespace.a
     listen_port = namespace.p
-
-    # проверка получения корретного номера порта для работы сервера.
-    if not 1023 < listen_port < 65536:
-        LOGGER.critical(
-            f'Попытка запуска сервера с указанием неподходящего порта '
-            f'{listen_port}. Допустимы адреса с 1024 до 65535.')
-        sys.exit(1)
-
     return listen_address, listen_port
 
 
-class Server:
+class Server(metaclass=ServerVerifier):
+    port = ServerPort()
+
     def __init__(self, listen_address, listen_port):
         # Параметры подключения
         self.addr = listen_address

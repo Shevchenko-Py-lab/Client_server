@@ -13,11 +13,12 @@ from common.variables import DEFAULT_PORT, DEFAULT_IP_ADDRESS, ACTION, \
     TIME, USER, ACCOUNT_NAME, SENDER, PRESENCE, RESPONSE, \
     ERROR, MESSAGE, MESSAGE_TEXT, DESTINATION, EXIT
 from unit_tests.log_decorator import log
+from metaclass import ClientVerifier
 
 LOGGER = logging.getLogger('client')
 
 
-class ClientSender(threading.Thread):
+class ClientSender(threading.Thread, metaclass=ClientVerifier):
     def __init__(self, account_name, sock):
         self.account_name = account_name
         self.sock = sock
@@ -81,13 +82,12 @@ class ClientSender(threading.Thread):
 
 
 # Класс-приёмник сообщений с сервера. Принимает сообщения, выводит в консоль.
-class ClientReader(threading.Thread):
+class ClientReader(threading.Thread, metaclass=ClientVerifier):
     def __init__(self, account_name, sock):
         self.account_name = account_name
         self.sock = sock
         super().__init__()
 
-    # Основной цикл приёмника сообщений, принимает сообщения, выводит в консоль. Завершается при потере соединения.
     def run(self):
         while True:
             try:
@@ -194,9 +194,9 @@ def main():
         exit(1)
     else:
         # Если соединение с сервером установлено корректно, запускаем клиентский процесс приёма сообщений
-        module_reciver = ClientReader(client_name, client_sock)
-        module_reciver.daemon = True
-        module_reciver.start()
+        module_receiver = ClientReader(client_name, client_sock)
+        module_receiver.daemon = True
+        module_receiver.start()
 
         # затем запускаем отправку сообщений и взаимодействие с пользователем.
         module_sender = ClientSender(client_name, client_name)
@@ -208,7 +208,7 @@ def main():
         # ввёл exit. Поскольку все события обработываются в потоках, достаточно просто завершить цикл.
         while True:
             time.sleep(1)
-            if module_reciver.is_alive() and module_sender.is_alive():
+            if module_receiver.is_alive() and module_sender.is_alive():
                 continue
             break
 
