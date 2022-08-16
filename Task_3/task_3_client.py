@@ -4,7 +4,6 @@ import time
 import argparse
 import logging
 import threading
-import log_project.config_client_log
 from errors import ReqFieldMissingError, IncorrectDataReceivedError, ServerError
 
 from common.utils import get_message, send_message
