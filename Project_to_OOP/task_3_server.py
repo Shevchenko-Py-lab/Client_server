@@ -1,18 +1,18 @@
 import sys
 import argparse
-import json
 import logging
 import select
-import time
 import socket
+import threading
 
-from Project_to_OOP.common.variables import DEFAULT_PORT, MAX_CONNECTIONS, ACTION, TIME, \
+from Project_to_OOP.common.variables import DEFAULT_PORT, ACTION, TIME, \
     USER, ACCOUNT_NAME, SENDER, PRESENCE, ERROR, MESSAGE, \
     MESSAGE_TEXT, RESPONSE_400, DESTINATION, RESPONSE_200, EXIT
 from Project_to_OOP.common.utils import get_message, send_message
 from Project_to_OOP.descriptors import ServerPort
 from Project_to_OOP.metaclass import ServerVerifier
 from Project_to_OOP.unit_tests.log_decorator import log
+from server_db import ServerDatabase
 
 LOGGER = logging.getLogger('server')
 
@@ -28,14 +28,15 @@ def create_arg_parser():
     return listen_address, listen_port
 
 
-class Server(metaclass=ServerVerifier):
+class Server(threading.Thread, metaclass=ServerVerifier):
     port = ServerPort()
 
-    def __init__(self, listen_address, listen_port):
+    def __init__(self, listen_address, listen_port, database):
         # Параметры подключения
         self.addr = listen_address
         self.port = listen_port
 
+        self.database = database
         # Список подключённых клиентов.
         self.clients = []
 
@@ -44,6 +45,7 @@ class Server(metaclass=ServerVerifier):
 
         # Словарь содержащий сопоставленные имена и соответствующие им сокеты.
         self.names = dict()
+        super().__init__()
 
     def init_socket(self):
         LOGGER.info(
@@ -167,14 +169,63 @@ class Server(metaclass=ServerVerifier):
             return
 
 
+def print_help():
+    print('Поддерживаемые комманды:')
+    print('users - список известных пользователей')
+    print('connected - список подключённых пользователей')
+    print('loghist - история входов пользователя')
+    print('exit - завершение работы сервера.')
+    print('help - вывод справки по поддерживаемым командам')
+
+
 def main():
     # Загрузка параметров командной строки, если нет параметров,
     # то задаём значения по умолчанию.
     listen_address, listen_port = create_arg_parser()
 
+    database = ServerDatabase()
+
     # Создание экземпляра класса - сервера.
-    server = Server(listen_address, listen_port)
+    server = Server(listen_address, listen_port, database)
+    server.daemon = True
     server.main_loop()
+
+    print_help()
+
+    while True:
+        command = input('Введите команду: ')
+        if command == 'help':
+            print_help()
+        elif command == 'exit':
+            break
+        elif command == 'users':
+            all_users = sorted(database.users_list())
+            if all_users:
+                for user in all_users:
+                    print(f'Пользователь {user[0]}, последний вход: {user[1]}')
+            else:
+                print('No data')
+
+        elif command == 'connected':
+            active_users = sorted(database.active_users_list())
+            if active_users:
+                for user in active_users:
+                    print(f'Пользователь {user[0]}, подключен: {user[1]}:{user[2]}, '
+                          f'время установки соединения: {user[3]}')
+            else:
+                print('No data')
+        elif command == 'loghist':
+            name = input('Введите имя пользователя для просмотра истории. '
+                         'Для вывода всей истории, просто нажмите Enter: ')
+            history = sorted(database.login_history(name))
+            if history:
+                for user in sorted(database.login_history(name)):
+                    print(f'Пользователь: {user[0]} время входа: {user[1]}. '
+                          f'Вход с: {user[2]}:{user[3]}')
+            else:
+                print('No data')
+        else:
+            print('Команда не распознана.')
 
 
 if __name__ == '__main__':

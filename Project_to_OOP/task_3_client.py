@@ -199,7 +199,7 @@ def main():
         module_receiver.start()
 
         # затем запускаем отправку сообщений и взаимодействие с пользователем.
-        module_sender = ClientSender(client_name, client_name)
+        module_sender = ClientSender(client_name, client_sock)
         module_sender.daemon = True
         module_sender.start()
         LOGGER.debug('Запущены процессы')
