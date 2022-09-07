@@ -15,7 +15,7 @@ ENCODING = 'utf-8'
 # Текущий уровень логирования
 LOGGING_LEVEL = logging.DEBUG
 # База данных для хранения данных сервера:
-SERVER_CONFIG = 'server_dist+++.ini'
+SERVER_CONFIG = 'server_dist.ini'
 
 # Протокол JIM основные ключи:
 ACTION = 'action'

@@ -55,8 +55,8 @@ class ClientVerifier(type):
         for command in ('accept', 'listen', 'socket'):
             if command in client_methods:
                 raise TypeError('В классе обнаружено использование запрещённого метода')
-            if 'get_message' in client_methods or 'send_message' in client_methods:
-                pass
-            else:
-                raise TypeError('Отсутствуют вызовы функций, работающих с сокетами.')
-            super().__init__(clsname, bases, clsdict)
+        if 'get_message' in client_methods or 'send_message' in client_methods:
+            pass
+        else:
+            raise TypeError('Отсутствуют вызовы функций, работающих с сокетами.')
+        super().__init__(clsname, bases, clsdict)

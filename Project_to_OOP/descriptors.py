@@ -1,8 +1,16 @@
 import logging
+import sys
 
 from Project_to_OOP.common.variables import DEFAULT_PORT
 
-logger = logging.getLogger('server_desc')
+# Инициализиция логера
+# метод определения модуля, источника запуска.
+if sys.argv[0].find('client_dist') == -1:
+    # если не клиент то сервер!
+    logger = logging.getLogger('server_dist')
+else:
+    # ну, раз не сервер, то клиент
+    logger = logging.getLogger('client_dist')
 
 
 class ServerPort:
