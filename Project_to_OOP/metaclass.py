@@ -15,7 +15,7 @@ class ServerVerifier(type):
                 pass
             else:
                 for i in ret:
-                    print(i)
+                    # print(i)
                     if i.opname == 'LOAD_GLOBAL':
                         if i.argval not in methods_global:
                             methods_global.append(i.argval)

@@ -3,7 +3,7 @@
 import sys
 import json
 from Project_to_OOP.unit_tests.log_decorator import log
-from Project_to_OOP.common.variables import MAX_PACKAGE_LENGTH, ENCODING
+from Project_to_OOP.common.variables import *
 from Project_to_OOP.errors import IncorrectDataReceivedError, NonDictInputError
 sys.path.append('../')
 
