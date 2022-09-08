@@ -6,11 +6,11 @@ import traceback
 import inspect
 
 # метод определения модуля, источника запуска.
-if sys.argv[0].find('client') == -1:
-    LOGGER = logging.getLogger('server')
+if sys.argv[0].find('client_dist') == -1:
+    LOGGER = logging.getLogger('server_dist')
 else:
     # ну, раз не сервер, то клиент
-    LOGGER = logging.getLogger('client')
+    LOGGER = logging.getLogger('client_dist')
 
 
 def log(func_to_log):
