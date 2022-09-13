@@ -54,7 +54,7 @@ class MessageProcessor(threading.Thread):
         # Конструктор предка
         super().__init__()
 
-    def main_socket(self):
+    def run(self):
         '''Метод основной цикл потока.'''
         # Инициализация Сокета
         self.init_socket()
