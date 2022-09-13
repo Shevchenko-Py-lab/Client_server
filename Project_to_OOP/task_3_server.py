@@ -25,7 +25,6 @@ from server.server_db import ServerDatabase
 from Project_to_OOP.server.main_window import MainWindow
 
 
-
 # Инициализация логирования сервера.
 logger = logging.getLogger('server_dist')
 
