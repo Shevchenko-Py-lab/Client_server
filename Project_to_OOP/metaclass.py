@@ -6,7 +6,6 @@ from pprint import pprint
 class ServerVerifier(type):
     def __init__(cls, clsname, bases, clsdict):
         methods_global = []  # 'LOAD_GLOBAL'
-        methods_func = []  # 'LOAD_METHOD'
         attributes = []  # 'LOAD_ATTR'
         for func in clsdict:
             try:
@@ -19,9 +18,6 @@ class ServerVerifier(type):
                     if i.opname == 'LOAD_GLOBAL':
                         if i.argval not in methods_global:
                             methods_global.append(i.argval)
-                    elif i.opname == 'LOAD_METHOD':
-                        if i.argval not in methods_func:
-                            methods_func.append(i.argval)
                     elif i.opname == 'LOAD_ATTR':
                         if i.argval not in attributes:
                             attributes.append(i.argval)

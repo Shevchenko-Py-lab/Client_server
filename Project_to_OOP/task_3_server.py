@@ -19,12 +19,10 @@ from Project_to_OOP.common.variables import *
 from Project_to_OOP.descriptors import ServerPort
 from Project_to_OOP.metaclass import ServerVerifier
 from server.core import MessageProcessor
-from server.main_window import MainWindow
 from Project_to_OOP.unit_tests.log_decorator import log
 import log_project.config_server_log
 from server.server_db import ServerDatabase
-from Project_to_OOP.server_gui import MainWindow, gui_create_model, HistoryWindow, create_stat_model, ConfigWindow
-
+from Project_to_OOP.server.main_window import MainWindow
 
 
 # Инициализация логирования сервера.
@@ -54,10 +52,12 @@ def arg_parser(default_port, default_address):
 # Загрузка файла конфигурации
 @log
 def config_load():
+    """Парсер конфигурационного ini файла."""
     config = configparser.ConfigParser()
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    config.read(f"{dir_path}/{'server.ini'}")
-    # Если конфиг файл загружен правильно, запускаемся, иначе конфиг по умолчанию.
+    config.read(f"{dir_path}/{'server_dist+++.ini'}")
+    # Если конфиг файл загружен правильно, запускаемся, иначе конфиг по
+    # умолчанию.
     if 'SETTINGS' in config:
         return config
     else:
@@ -65,22 +65,26 @@ def config_load():
         config.set('SETTINGS', 'Default_port', str(DEFAULT_PORT))
         config.set('SETTINGS', 'Listen_Address', '')
         config.set('SETTINGS', 'Database_path', '')
-        config.set('SETTINGS', 'Database_file', 'server_database.db3')
+        config.set('SETTINGS', 'Database_file', 'server_base.db3')
         return config
 
 
 @log
 def main():
+    '''Основная функция'''
     # Загрузка файла конфигурации сервера
     config = config_load()
 
-    # Загрузка параметров командной строки, если нет параметров, то задаём значения по умоланию.
-    listen_address, listen_port, gui_flag = arg_parser(config['SETTINGS']['Default_port'],
-                                             config['SETTINGS']['Listen_Address'])
+    # Загрузка параметров командной строки, если нет параметров, то задаём
+    # значения по умоланию.
+    listen_address, listen_port, gui_flag = arg_parser(
+        config['SETTINGS']['Default_port'], config['SETTINGS']['Listen_Address'])
 
     # Инициализация базы данных
-    database = ServerDatabase(os.path.join(config['SETTINGS']['Database_path'],
-                                          config['SETTINGS']['Database_file']))
+    database = ServerDatabase(
+        os.path.join(
+            config['SETTINGS']['Database_path'],
+            config['SETTINGS']['Database_file']))
 
     # Создание экземпляра класса - сервера и его запуск:
     server = MessageProcessor(listen_address, listen_port, database)
@@ -97,6 +101,7 @@ def main():
                 server.running = False
                 server.join()
                 break
+
     # Если не указан запуск без GUI, то запускаем GUI:
     else:
         # Создаём графическое окружение для сервера:
